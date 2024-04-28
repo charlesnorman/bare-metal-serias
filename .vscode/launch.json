@@ -1,0 +1,47 @@
+{
+  "configurations": [
+    {
+      "cwd": "${workspaceRoot}",
+      "executable": "${workspaceRoot}/app/firmware.elf",
+      "name": "Debug with OpenOCD",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "configFiles": [
+        "st_nucleo_f4.cfg"
+      ],
+      "searchDir": [
+        "/usr/share/openocd/scripts/board/"
+      ],
+      "runToEntryPoint": "main",
+      "showDevDebugOutput": "none",
+      "svdPath": "/home/charles/STM/SVDFiles/STM32F401.svd"
+    },
+    
+    {
+      "name": "Debug Application",
+      "cwd": "${workspaceFolder}/app",
+      "executable": "./firmware.elf",
+      "serverpath": "/usr/bin/JLinkGDBServer",
+      "servertype": "jlink",
+      "request": "launch",
+      "type": "cortex-debug",
+      "device": "STM32F401RE",
+      "runToEntryPoint": "main",
+      "interface": "swd",
+      "preLaunchTask": "build_debug"
+    },
+    {
+      "name": "Attach to active",
+      "cwd": "${workspaceFolder}/app",
+      "executable": "./firmware.elf",
+      "serverpath": "/usr/bin/JLinkGDBServer",
+      "servertype": "jlink",
+      "request": "attach",
+      "type": "cortex-debug",
+      "device": "STM32F401RE",
+      "runToEntryPoint": "main",
+      "interface": "swd",
+    }
+  ]
+}
