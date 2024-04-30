@@ -7,21 +7,18 @@
       "request": "launch",
       "type": "cortex-debug",
       "servertype": "openocd",
-      "configFiles": [
-        "st_nucleo_f4.cfg"
-      ],
-      "searchDir": [
-        "/usr/share/openocd/scripts/board/"
-      ],
+      "configFiles": ["st_nucleo_f4.cfg"],
+      "searchDir": ["/usr/share/openocd/scripts/board/"],
       "runToEntryPoint": "main",
       "showDevDebugOutput": "none",
       "svdPath": "/home/charles/STM/SVDFiles/STM32F401.svd"
     },
-    
+
     {
       "name": "Debug Application",
       "cwd": "${workspaceFolder}/app",
       "executable": "./firmware.elf",
+      // "executable": "./bootloader.elf",
       "serverpath": "/usr/bin/JLinkGDBServer",
       "servertype": "jlink",
       "request": "launch",
@@ -41,7 +38,7 @@
       "type": "cortex-debug",
       "device": "STM32F401RE",
       "runToEntryPoint": "main",
-      "interface": "swd",
+      "interface": "swd"
     }
   ]
 }

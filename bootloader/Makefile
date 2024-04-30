@@ -9,7 +9,7 @@ SRC_DIR     = src
 INC_DIR     = inc
 OPENCM3_DIR = ../libopencm3
 
-BINARY = firmware
+BINARY = bootloader
 
 ###############################################################################
 # Basic Device Setup
@@ -55,14 +55,11 @@ CSTD		?= -std=c99
 # Source files
 
 OBJS		+= $(SRC_DIR)/$(BINARY).o
-OBJS		+= $(SRC_DIR)/bootloader.o
-OBJS		+= $(SRC_DIR)/core/system.o
-OBJS		+= $(SRC_DIR)/core/timer.o
 
 ###############################################################################
 # C flags
 
-TGT_CFLAGS	+= $(OPT) $(CSTD) $(DEBUG)  
+TGT_CFLAGS	+= $(OPT) $(CSTD) $(DEBUG)
 TGT_CFLAGS	+= $(ARCH_FLAGS)
 TGT_CFLAGS	+= -Wextra -Wshadow -Wimplicit-function-declaration
 TGT_CFLAGS	+= -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes
@@ -139,6 +136,7 @@ print-%:
 %.bin: %.elf
 	@#printf "  OBJCOPY $(*).bin\n"
 	$(Q)$(OBJCOPY) -Obinary $(*).elf $(*).bin
+	$(Q)python3 pad-bootloader.py
 
 %.hex: %.elf
 	@#printf "  OBJCOPY $(*).hex\n"
@@ -160,7 +158,7 @@ print-%:
 	@#printf "  CC      $(*).c\n"
 	$(Q)$(CC) $(TGT_CFLAGS) $(CFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).c
 
-%.o: %.S %.s 
+%.o: %.S
 	@#printf "  CC      $(*).S\n"
 	$(Q)$(CC) $(TGT_CFLAGS) $(CFLAGS) -o $(*).o -c $(*).S
 
