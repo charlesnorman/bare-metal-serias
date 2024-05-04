@@ -11,6 +11,11 @@
     "sync.h": "c",
     "ring-buffer.h": "c",
     "flash_common_all.h": "c",
-    "timer_common_f24.h": "c"
+    "timer_common_f24.h": "c",
+    "usart.h": "c",
+    "usart_common_f24.h": "c",
+    "nvic.h": "c",
+    "rcc.h": "c",
+    "common.h": "c"
   }
 }
