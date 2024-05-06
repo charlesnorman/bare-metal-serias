@@ -33,3 +33,12 @@ void system_setup(void)
     rcc_setup();
     systick_setup();
 }
+
+void system_delay(uint64_t milliseconds)
+{
+    uint64_t endtime = system_get_ticks() + milliseconds;
+    while (system_get_ticks() < endtime)
+    {
+        __asm__("nop"); // spin
+    }
+}
