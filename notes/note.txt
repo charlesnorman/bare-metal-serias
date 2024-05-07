@@ -1,0 +1,88 @@
+####################### What is a Ring Buffer? ################################
+
+- Sometimes known as a circular buffer.
+- Basically, a buffer that wraps back arouns when you get to the end
+- Cam be seen as having two sperate interfaces: one for reading, and one for writing
+- I a single producer/single consumer model, it gives ua certain guarantees
+
+If write_ptr == read_ptr, no data available
+---------------------------------------------------------------
+read_ptr
+  |
+  0         1       2       3       4       5       6       7
+  |
+ write_ptr
+---------------------------------------------------------------
+
+A byte comes in to the interupt routine, call buffer_write 
+If write_ptr != read_ptr, data available
+---------------------------------------------------------------
+read_ptr
+  |
+  0         1       2       3       4       5       6       7
+  |
+        write_ptr
+---------------------------------------------------------------
+
+Later in program, read data
+If write_ptr == read_ptr, no data available
+---------------------------------------------------------------
+        read_ptr
+  |
+  0         1       2       3       4       5       6       7
+  |
+        write_ptr
+---------------------------------------------------------------
+
+If the length of the buffer is a power of 2, you can use a bit 
+mask to wrap the pointer around. The bit mask will be one less
+than the length of the buffer.  In this example the bit mask would
+be 7 or 0b0111.  You and the bit mask with the pointer "index".  
+When the index reaches 8, if will "wrap" back to 0.
+
+###############################################################################
+
+####################### Building a Packet Protocol ############################
+
+                        PACKET 18 Bytes
+---------------------------------------------------------------------------------
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 
+---------------------------------------------------------------------------------
+byte[0] - Length of data bytes
+byte[1] through byte[16] - data
+byte[17] - CRC 
+
+###############################################################################
+
+####################### State Machine TX/RX  ##################################
+
+             |<-------------Is Acknowledge<-----------------|
+             |                                              |
+             |<---Store packet<----TX Acknowledge<----------|
+             |                                              |
+             |                                              |
+ |--->Receive length byte---->Receive data bytes ---->Receive CRC byte--(is ReTx)-->Retransmit Last Packet
+ |                                                          |                                 |
+ |                                                      (Bad CRC)                             |
+ |                                                          |                                 |
+ |<------------------Request Retransmit-------------------------------------------------------|
+
+Always start at Receive Length byte.
+
+###############################################################################
+
+####################### State Machine Firmware update  ########################
+
+      Wait       Send      Wait       Request      Request     Receive
+   for Sync---->Sycned---->Update---->Firmware---->Firmware---->Firmware
+      |         Message    Request    Device ID    Length         |
+      |            |          |           |          |            |
+      |---------------------->|<----------------------------------| 
+                              |                                   |
+                          Time OUT                          Firmware Update
+                              |                                Complete
+                              |                                   |
+                         Jump To Main-----------------------------| 
+                         Application     
+
+
