@@ -31,7 +31,7 @@ static void gpio_setup(void)
   gpio_set_af(LED_PORT, GPIO_AF1, LED_PIN);
 
   gpio_mode_setup(UART_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, TX_PIN | RX_PIN);
-  gpio_set_af(LED_PORT, GPIO_AF7, TX_PIN | RX_PIN);
+  gpio_set_af(UART_PORT, GPIO_AF7, TX_PIN | RX_PIN);
 }
 
 int main(void)

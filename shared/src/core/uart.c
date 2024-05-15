@@ -20,11 +20,13 @@ void usart1_isr(void)
 
     if (received_data || overrun_occurred)
     {
-        if (ring_buffer_write(&rb, (uint8_t)usart_recv(USART1)))
+        uint8_t temp = usart_recv(USART1);
+        if (ring_buffer_write(&rb, temp))
         {
             __asm__("nop"); // Handle the over write
         }
     }
+    __asm__("nop");
 }
 
 void uart_setup(void)

@@ -16,6 +16,10 @@
     "usart_common_f24.h": "c",
     "nvic.h": "c",
     "rcc.h": "c",
-    "common.h": "c"
+    "common.h": "c",
+    "assert.h": "c",
+    "uart.h": "c",
+    "crc8.h": "c",
+    "common-defines.h": "c"
   }
 }

@@ -20,7 +20,7 @@ If write_ptr != read_ptr, data available
 read_ptr
   |
   0         1       2       3       4       5       6       7
-  |
+            |
         write_ptr
 ---------------------------------------------------------------
 
@@ -28,9 +28,9 @@ Later in program, read data
 If write_ptr == read_ptr, no data available
 ---------------------------------------------------------------
         read_ptr
-  |
+            |
   0         1       2       3       4       5       6       7
-  |
+            |
         write_ptr
 ---------------------------------------------------------------
 

@@ -1,34 +1,66 @@
 #include "common-defines.h"
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/memorymap.h>
+#include <libopencm3/cm3/vector.h>
+
+#include "core/uart.h"
+#include "core/system.h"
+#include "comms.h"
+
+/**
+ * USART_1_TX PA9, AF07
+ * USART_1_RX PA10, AF07
+ */
+#define UART_PORT (GPIOA)
+#define TX_PIN (GPIO9)
+#define RX_PIN (GPIO10)
 
 #define BOOTLOADER_SIZE (0x8000U)
 #define MAIN_APP_START_ADDRESS (FLASH_BASE + BOOTLOADER_SIZE)
 
+static void gpio_setup(void)
+{
+  rcc_periph_clock_enable(RCC_GPIOA);
+  gpio_mode_setup(UART_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, TX_PIN | RX_PIN);
+  gpio_set_af(UART_PORT, GPIO_AF7, TX_PIN | RX_PIN);
+}
+
 static void jump_to_main(void)
 {
-
-  typedef void (*void_fn)(void);
-
-  /*  This is the address of the reset entry pointer
-      Will point to 0x8800 + 4.
-      This is the address of the new address vector.
-  */
-  uint32_t *reset_vector_entry = (uint32_t *)(MAIN_APP_START_ADDRESS + 4U);
-
-  /**
-   * Dereference the pointer at 0x8800 + 4.
-   * This will give us the address of the app program entry.
-   * Store this address in the reset_vector pointer.
-   */
-  uint32_t *reset_vector = (uint32_t *)(*reset_vector_entry);
-
-  void_fn jump_fn = (void_fn)reset_vector;
-
-  jump_fn();
+  vector_table_t *main_vector_table = (vector_table_t *)MAIN_APP_START_ADDRESS;
+  main_vector_table->reset();
 }
 
 int main(void)
 {
+  system_setup();
+  gpio_setup();
+  uart_setup();
+  comms_setup();
+
+  comms_packet_t packet = {
+      .length = 9,
+      .data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+      .crc = 0};
+  packet.crc = comms_compute_crc(&packet);
+
+  comms_packet_t rx_packet;
+
+  while (true)
+  {
+    comms_update();
+
+    if (comms_packets_available())
+    {
+      comms_read(&rx_packet);
+    }
+
+    comms_write(&packet);
+    system_delay(500);
+  }
+
+  // TODO: Teardown
 
   jump_to_main();
 

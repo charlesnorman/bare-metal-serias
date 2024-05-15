@@ -5,9 +5,11 @@ Q		:= @
 NULL		:= 2>/dev/null
 endif
 
-SRC_DIR     = src
-INC_DIR     = inc
-OPENCM3_DIR = ../libopencm3
+SRC_DIR			= src
+INC_DIR			= inc
+SHARED_SRC_DIR	= ../shared/src
+SHARED_INC_DIR	= ../shared/inc
+OPENCM3_DIR		= ../libopencm3
 
 BINARY = bootloader
 
@@ -31,6 +33,7 @@ LDFLAGS		+= -L$(OPENCM3_DIR)/lib
 
 DEFS		+= -I$(OPENCM3_DIR)/include
 DEFS		+= -I$(INC_DIR)
+DEFS		+= -I$(SHARED_INC_DIR)
 
 ###############################################################################
 # Executables
@@ -46,7 +49,7 @@ OBJCOPY		:= $(PREFIX)objcopy
 OBJDUMP		:= $(PREFIX)objdump
 GDB		:= $(PREFIX)gdb
 STFLASH		= $(shell which st-flash)
-OPT		:= -O
+OPT		:= -O0
 DEBUG		:= -ggdb3
 CSTD		?= -std=c99
 
@@ -55,6 +58,11 @@ CSTD		?= -std=c99
 # Source files
 
 OBJS		+= $(SRC_DIR)/$(BINARY).o
+OBJS		+= $(SRC_DIR)/comms.o
+OBJS		+= $(SHARED_SRC_DIR)/core/system.o
+OBJS		+= $(SHARED_SRC_DIR)/core/crc8.o
+OBJS		+= $(SHARED_SRC_DIR)/core/uart.o
+OBJS		+= $(SHARED_SRC_DIR)/core/ring_buffer.o
 
 ###############################################################################
 # C flags

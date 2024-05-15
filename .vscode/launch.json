@@ -2,7 +2,8 @@
   "configurations": [
     {
       "cwd": "${workspaceRoot}",
-      "executable": "${workspaceRoot}/app/firmware.elf",
+      // "executable": "${workspaceRoot}/app/firmware.elf",
+      "executable": "${workspaceRoot}/bootloader/bootloader.elf",
       "name": "Debug with OpenOCD",
       "request": "launch",
       "type": "cortex-debug",
@@ -17,8 +18,8 @@
     {
       "name": "Debug Application",
       "cwd": "${workspaceFolder}/app",
-      "executable": "./firmware.elf",
-      // "executable": "./bootloader.elf",
+      // "executable": "./firmware.elf",
+      "executable": "./bootloader.elf",
       "serverpath": "/usr/bin/JLinkGDBServer",
       "servertype": "jlink",
       "request": "launch",
