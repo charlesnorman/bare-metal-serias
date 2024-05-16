@@ -86,3 +86,16 @@ Always start at Receive Length byte.
                          Application     
 
 
+####################### Simple Timer API  #####################################
+
+- Setting the timeout
+- Checking if it has elapsed
+- Resetting the timer, accounting for any drift
+
+Steps:
+- Structure
+- Functions to interact with the timer
+- Test it Out!
+
+
+###############################################################################

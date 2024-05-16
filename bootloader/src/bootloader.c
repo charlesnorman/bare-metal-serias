@@ -8,6 +8,7 @@
 #include "core/system.h"
 #include "comms.h"
 #include "bl-flash.h"
+#include "core/simple-timer.h"
 
 /**
  * USART_1_TX PA9, AF07
@@ -40,22 +41,16 @@ int main(void)
   // uart_setup();
   // comms_setup();
 
-  uint8_t data[1024] = {0};
-  for (uint16_t i = 0; i < 1024; i++)
-  {
-    data[i] = i & 0xff;
-  }
-
-  bl_erase_main_application();
-  bl_flash_write(0x08008000, data, 1024);
-  bl_flash_write(0x0800C000, data, 1024);
-  bl_flash_write(0x08010000, data, 1024);
-  bl_flash_write(0x08020000, data, 1024);
-  bl_flash_write(0x08040000, data, 1024);
-  bl_flash_write(0x08060000, data, 1024);
+  simple_timer_t timer;
+  simple_timer_setup(&timer, 1000, false);
 
   while (true)
   {
+    if (simple_timer_has_elapsed(&timer))
+    {
+      volatile int x = 0;
+      x++;
+    }
   }
 
   // TODO: Teardown
