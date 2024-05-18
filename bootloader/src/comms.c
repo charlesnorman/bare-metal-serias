@@ -1,3 +1,4 @@
+#include <string.h>
 #include <assert.h>
 #include "comms.h"
 #include "core/uart.h"
@@ -29,7 +30,7 @@ static uint32_t packet_buffer_read_index = 0;
 static uint32_t packet_buffer_write_index = 0;
 static uint8_t packet_buffer_index_mask = PACKET_BUFFER_LENGTH - 1;
 
-static bool comms_is_single_byte_packet(
+bool comms_is_single_byte_packet(
     const comms_packet_t *packet, uint8_t byte)
 {
     if (packet->length != 1)
@@ -52,33 +53,18 @@ static bool comms_is_single_byte_packet(
     return true;
 }
 
-static void comms_packet_copy(const comms_packet_t *source, comms_packet_t *dest)
+void comms_create_single_byte_packet(comms_packet_t *packet, uint8_t byte)
 {
-    dest->length = source->length;
-    for (uint8_t i = 0; i < PACKET_DATA_LENGTH; i++)
-    {
-        dest->data[i] = source->data[i];
-    }
-    dest->crc = source->crc;
+    memset(packet, 0xff, sizeof(comms_packet_t));
+    packet->length = 1;
+    packet->data[0] = byte;
+    packet->crc = comms_compute_crc(packet);
 }
 
 void comms_setup(void)
 {
-    retx_packet.length = 1;
-    retx_packet.data[0] = PACKET_RETX_DATA0;
-    for (uint8_t i = 1; i < PACKET_DATA_LENGTH; i++)
-    {
-        retx_packet.data[i] = 0xff;
-    }
-    retx_packet.crc = comms_compute_crc(&retx_packet);
-
-    ack_packet.length = 1;
-    ack_packet.data[0] = PACKET_ACK_DATA0;
-    for (uint8_t i = 1; i < PACKET_DATA_LENGTH; i++)
-    {
-        ack_packet.data[i] = 0xff;
-    }
-    ack_packet.crc = comms_compute_crc(&ack_packet);
+    comms_create_single_byte_packet(&retx_packet, PACKET_RETX_DATA0);
+    comms_create_single_byte_packet(&ack_packet, PACKET_ACK_DATA0);
 }
 
 void comms_update(void)
@@ -141,8 +127,8 @@ void comms_update(void)
             }
             // assert(next_buffer_write_index != packet_buffer_write_index);
 
-            comms_packet_copy(&temporary_packet,
-                              &packet_buffer[packet_buffer_write_index]);
+            memcpy(&packet_buffer[packet_buffer_write_index],
+                   &temporary_packet, sizeof(comms_packet_t));
             packet_buffer_write_index = next_buffer_write_index;
 
             comms_write(&ack_packet);
@@ -166,13 +152,12 @@ bool comms_packets_available(void)
 void comms_write(comms_packet_t *packet)
 {
     uart_write((uint8_t *)packet, PACKET_LENGTH);
-    comms_packet_copy(packet, &last_transmitted_packet);
+    memcpy(&last_transmitted_packet, packet, sizeof(comms_packet_t));
 }
 
 void comms_read(comms_packet_t *packet)
 {
-    comms_packet_copy(&packet_buffer[packet_buffer_read_index],
-                      packet);
+    memcpy(packet, &packet_buffer[packet_buffer_read_index], sizeof(comms_packet_t));
     packet_buffer_read_index = (packet_buffer_read_index + 1) &
                                packet_buffer_index_mask;
 }

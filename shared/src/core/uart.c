@@ -47,6 +47,14 @@ void uart_setup(void)
     usart_enable(USART1);
 }
 
+void uart_teardown(void)
+{
+    usart_disable_rx_interrupt(USART1);
+    usart_disable(USART1);
+    nvic_disable_irq(NVIC_USART1_IRQ);
+    rcc_periph_clock_disable(RCC_USART1);
+}
+
 void uart_write(uint8_t *data, const uint8_t length)
 {
     for (uint32_t i = 0; i < length; i++)
