@@ -215,7 +215,8 @@ int main(void)
       if (comms_packets_available())
       {
         comms_read(&temp_packet);
-        if (is_device_id_packet(&temp_packet) && (temp_packet.data[1] == DEVICE_ID))
+        if (is_device_id_packet(&temp_packet) &&
+            (temp_packet.data[1] == DEVICE_ID))
         {
           simple_timer_reset(&timer);
           state = BL_State_FWLengthReq;
@@ -270,6 +271,8 @@ int main(void)
     case BL_State_EraseApplicaion:
     {
       bl_erase_main_application();
+      comms_create_single_byte_packet(&temp_packet, BL_PACKET_READY_FOR_DATA_DATA0);
+      comms_write(&temp_packet);
       simple_timer_reset(&timer);
       state = BL_State_ReceiveFirmware;
     }
@@ -294,6 +297,11 @@ int main(void)
           comms_write(&temp_packet);
           state = BL_State_Done;
         }
+        else
+        {
+          comms_create_single_byte_packet(&temp_packet, BL_PACKET_READY_FOR_DATA_DATA0);
+          comms_write(&temp_packet);
+        }
       }
       else
       {
@@ -309,7 +317,7 @@ int main(void)
     }
   }
 
-  system_delay(150);
+  system_delay(160);
   uart_teardown();
   gpio_teardown();
   system_teardown();

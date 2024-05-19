@@ -99,3 +99,15 @@ Steps:
 
 
 ###############################################################################
+
+
+####################### Firmware Update Porgram ###############################
+## Main points:
+
+- Read the firmware file from disk
+- Implement the same flow as in the boolloader
+- Copy the constanst from comms.h / bootloader.c
+- Automatic exit on NACK
+- Logging
+
+###############################################################################
